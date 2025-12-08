@@ -858,7 +858,11 @@ emerge from the same geometric foundation.
 -/
 def metaCycle : ℝ := (cycleLen : ℝ) ^ 2  -- = 169
 
-/-- Provisional nesting depth k for gravity (to be refined from geometry). -/
+/-- Provisional nesting depth k for gravity (to be refined from geometry).
+
+    Note: This may relate to the Nested Triple Manifold Analysis structure
+    (see UFRF.Nesting), but that connection is currently hypothetical.
+-/
 def kGravity : ℝ := 16.2
 
 /-- Measurement scale where lab gravity experiments live. -/

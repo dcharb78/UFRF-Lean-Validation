@@ -20,10 +20,11 @@
 import UFRF.Foundation
 import UFRF.RecursiveCycle
 import UFRF.UPrime
+import UFRF.Nesting
 
 namespace UFRF.Spectral
 
-open UFRF RecursiveCycle Phase UPrime
+open UFRF RecursiveCycle Phase UPrime Nesting
 
 /-!
 ## Spectral Basis Structure
@@ -193,6 +194,18 @@ def axisCoupling (x y : BasisIndex) : ℝ :=
   else
     0.0
 
+/-- Check if a position is a nesting-special position (89, 233, etc.).
+
+    Based on Nested Triple Manifold Analysis hypothesis:
+    - Position 89 = manifoldChannels(4) + bridgeChannels(3) = 81 + 8
+    - Position 233 = manifoldChannels(5) - 10 = 243 - 10
+    
+    These are hypothesized to be scale-dependent manifold agreement points.
+-/
+def isNestingSpecial (pos : Fin cycleLen) : Prop :=
+  pos.val = 89 % cycleLen ∨ pos.val = 233 % cycleLen ∨
+  pos.val = 3 ∨ pos.val = 5
+
 /-- Mass term: diagonal contribution based on node properties.
 
     The mass term depends on:
@@ -200,6 +213,7 @@ def axisCoupling (x y : BasisIndex) : ℝ :=
     - Phase (REST phase has special mass)
     - Trinity (zero/balance has different mass)
     - UFRF-primality (primes have enhanced mass - "spectral activation")
+    - Nesting-special positions (89, 233, etc. - scale-dependent enhancement)
 -/
 def massTerm (x : BasisIndex) : ℝ :=
   let levelMass := (x.node.level : ℝ) * 0.1
@@ -215,7 +229,8 @@ def massTerm (x : BasisIndex) : ℝ :=
     | Trinity.zero => 0.5  -- Balance point has special mass
     | _ => 0.3
   let primeMass := if isUPrime x.node then 0.5 else 0.0  -- UFRF-primes have enhanced mass
-  levelMass + phaseMass + trinityMass + primeMass
+  let nestingMass := if isNestingSpecial x.node.pos then 0.2 else 0.0  -- Nesting-special positions
+  levelMass + phaseMass + trinityMass + primeMass + nestingMass
 
 /-!
 ## Spectral Operator H_full

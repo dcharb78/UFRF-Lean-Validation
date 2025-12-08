@@ -18,6 +18,8 @@ import UFRF.MonsterMoonshine
 import UFRF.RecursiveCycle
 import UFRF.Spectral
 import UFRF.UPrime
+-- Note: UFRF.Nesting contains HYPOTHESIS (not proven theorems) about
+-- scale-dependent manifold agreement points. See docs/NESTED_TRIPLE_MANIFOLD.md
 
 namespace UFRF
 

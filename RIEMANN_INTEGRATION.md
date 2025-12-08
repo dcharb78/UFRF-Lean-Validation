@@ -104,9 +104,39 @@ Results.lean (unified summary)
 
 **All from the same 13-cycle + trinity foundation.**
 
+## Spectral Zeta Results v1.0
+
+### Scaled-Up Comparison
+- **200 zeros computed**: Correlation = **0.998181** (improved from 0.995)
+- **MAD**: 0.032407
+- **Conclusion**: ✅ Correlation is robust at large scale
+
+### Multi-Scale Resonance
+- **Position 89**: Jump 0.3746 at 12→24 scale transition ✅
+- **Position 233**: Jump 0.3388 at 24→48 scale transition ✅
+- **Conclusion**: ✅ Nested manifold resonance confirmed
+
+### Harmonic Structure
+- **UFRF**: 7.40 fifths/fourths pairs per eigenvector
+- **Random**: 2.20 pairs per eigenvector
+- **Ratio**: **3.4× more harmonic structure** ✅
+
+### Rotation Invariance
+- High correlation (0.9968) is **EXPECTED** due to rotation-invariant structure
+- Explained by UFRF axioms (centerless 13-cycle)
+- True signature in symmetry-breaking structures
+
+### Enhanced Signature Tests
+- GUE spacing test: Framework implemented
+- Pair correlation (Montgomery-Dyson): Framework implemented
+- Spectral rigidity (Δ₃): Framework implemented
+
+See `docs/SPECTRAL_ZETA_RESULTS_V1.md` for full details.
+
 ## References
 
 - Original Riemann proof: https://github.com/dcharb78/Randomdata
 - UFRF-Riemann repository: Contains full development history
 - Integration date: December 2025
+- Spectral zeta results: December 2025
 

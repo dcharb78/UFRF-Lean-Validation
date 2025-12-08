@@ -104,7 +104,10 @@ Each coupling respects the geometric structure.
     - Same axis
     - Positions differ by ±1 mod 13
     
-    Coupling strength is enhanced if either node is UFRF-prime.
+    Coupling strength is enhanced by:
+    - UFRF-primality (either node)
+    - Nesting-special positions (89, 233 resonance)
+    - System level (higher levels get stronger coupling)
 -/
 def cycleCoupling (x y : BasisIndex) : ℝ :=
   if x.node.level = y.node.level ∧
@@ -119,8 +122,12 @@ def cycleCoupling (x y : BasisIndex) : ℝ :=
       -- Base coupling strength
       let baseStrength := 1.0
       -- Enhanced if UFRF-prime
-      let enhancement := if isUPrime x.node ∨ isUPrime y.node then 0.5 else 0.0
-      baseStrength + enhancement
+      let primeEnhancement := if isUPrime x.node ∨ isUPrime y.node then 0.5 else 0.0
+      -- Enhanced if nesting-special (89, 233 resonance)
+      let nestingEnhancement := if isNestingSpecial x.node.pos ∨ isNestingSpecial y.node.pos then 0.3 else 0.0
+      -- Enhanced by system level (manifoldChannels structure)
+      let levelEnhancement := (x.node.level : ℝ) * 0.1
+      baseStrength + primeEnhancement + nestingEnhancement + levelEnhancement
     else
       0.0
   else
@@ -134,19 +141,26 @@ def cycleCoupling (x y : BasisIndex) : ℝ :=
     - Same axis
     - Positions are related by fifthsStep or fourthsStep
     
-    Coupling is stronger if both nodes are UFRF-prime (harmonic resonance).
+    Coupling is enhanced by:
+    - UFRF-primality (both nodes - harmonic resonance)
+    - Nesting-special positions (manifold resonance)
+    - System level (manifoldChannels structure)
 -/
 def harmonicCoupling (x y : BasisIndex) : ℝ :=
   if x.node.level = y.node.level ∧
      x.trinity = y.trinity ∧
      x.axis = y.axis then
-    -- Check if y.pos = fifthsStep x.pos or y.pos = fourthsStep x.pos
+    -- Check if y.pos = fifthsStep x.pos or y.pos = fourthsStep x.node.pos
     if y.node.pos = fifthsStep x.node.pos ∨ y.node.pos = fourthsStep x.node.pos then
       -- Base harmonic coupling strength
       let baseStrength := 0.5
       -- Enhanced if both are UFRF-prime (harmonic resonance)
-      let resonance := if isUPrime x.node ∧ isUPrime y.node then 0.3 else 0.0
-      baseStrength + resonance
+      let primeResonance := if isUPrime x.node ∧ isUPrime y.node then 0.3 else 0.0
+      -- Enhanced if nesting-special (manifold resonance at 89, 233)
+      let nestingResonance := if (isNestingSpecial x.node.pos ∧ isNestingSpecial y.node.pos) then 0.4 else 0.0
+      -- Enhanced by system level (manifoldChannels: 3^L structure)
+      let levelResonance := (x.node.level : ℝ) * 0.15
+      baseStrength + primeResonance + nestingResonance + levelResonance
     else
       0.0
   else

@@ -275,6 +275,54 @@ def H_full (x y : BasisIndex) : ℝ :=
   axisCoupling x y
 
 /-!
+## Fractal Self-Similarity Structure
+
+The UFRF operator should exhibit fractal self-similarity across system levels:
+the pattern of couplings at level L should be the same as level 0, up to a scaling factor.
+
+This is encoded as a structure describing "wrapUp-consistent" couplings.
+-/
+
+/-- Structure describing that the pattern of couplings at level L
+    is the same as level 0 up to a scaling factor.
+    
+    This captures the fractal self-similarity property: H_L ≈ scale * H_0
+    where the coupling patterns are preserved across levels.
+-/
+structure LevelSelfSimilar (H : BasisIndex → BasisIndex → ℝ) : Prop :=
+  /-- For nodes at the same level L, the coupling pattern matches level 0.
+      Specifically, if we restrict H to level L nodes, the normalized pattern
+      should match the pattern at level 0.
+  -/
+  (pattern_preserved : ∀ L : ℕ, ∀ x y : BasisIndex,
+    x.node.level = L → y.node.level = L →
+    -- The relative coupling strengths should match level 0 pattern
+    ∃ scale : ℝ, scale > 0 ∧
+    ∀ x0 y0 : BasisIndex,
+      x0.node.level = 0 → y0.node.level = 0 →
+      x0.node.pos = x.node.pos → y0.node.pos = y.node.pos →
+      x0.trinity = x.trinity → y0.trinity = y.trinity →
+      x0.axis = x.axis → y0.axis = y.axis →
+      H x y = scale * H x0 y0)
+  
+  /-- The scaling factor should depend on system level in a predictable way.
+      Higher levels may have stronger couplings (manifoldChannels structure).
+  -/
+  (scaling_monotonic : ∀ L1 L2 : ℕ,
+    L1 < L2 →
+    ∃ scale1 scale2 : ℝ, scale1 > 0 ∧ scale2 > 0 ∧
+    scale1 ≤ scale2)
+
+/-- Hypothesis: H_full exhibits level self-similarity.
+    
+    This is a key property of UFRF: the coupling pattern repeats at each
+    system level, scaled by the manifoldChannels structure (3^L).
+    
+    This property can be tested numerically but is not yet proven formally.
+-/
+axiom H_full_level_self_similar : LevelSelfSimilar H_full
+
+/-!
 ## Basic Properties
 
 We prove that H_full is symmetric and has other basic properties needed

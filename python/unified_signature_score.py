@@ -25,6 +25,7 @@ from spectral_analysis import load_zeta_zeros
 from symmetry_breaking_tests import *
 from enhanced_signature_tests import test_gue_spacing, test_pair_correlation, spectral_rigidity
 from real_5scale_test import run_real_5scale_test
+from fractal_self_similarity import test_fractal_self_similarity
 from typing import Dict
 
 def compute_unified_signature_score(basis: List, H: np.ndarray, 
@@ -154,6 +155,19 @@ def compute_unified_signature_score(basis: List, H: np.ndarray,
         scores["spectral_rigidity"] = 0.0
         weights["spectral_rigidity"] = 0.10
     
+    # 7. Fractal Self-Similarity (0-1)
+    print("7. Computing fractal self-similarity...")
+    # Adjust weights to make room for new component
+    # Reduce other weights slightly
+    for key in weights:
+        weights[key] = weights[key] * 0.93  # Make room for 0.15 weight
+    
+    fractal_result = test_fractal_self_similarity(max_level=min(3, max(b.node.level for b in basis)))
+    fractal_score = fractal_result.get("overall_score", 0.0)
+    scores["fractal_self_similarity"] = fractal_score
+    weights["fractal_self_similarity"] = 0.15
+    print(f"   Overall fractal score: {fractal_score:.4f} → Score: {fractal_score:.4f}")
+    
     # Compute weighted total
     total_score = sum(scores[key] * weights[key] for key in scores.keys())
     total_weight = sum(weights.values())
@@ -170,6 +184,7 @@ def compute_unified_signature_score(basis: List, H: np.ndarray,
             "multi_scale_resonance": scores.get("multi_scale_resonance", 0),
             "pair_correlation": scores.get("pair_correlation", 0),
             "spectral_rigidity": scores.get("spectral_rigidity", 0),
+            "fractal_self_similarity": scores.get("fractal_self_similarity", 0),
         }
     }
 

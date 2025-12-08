@@ -76,9 +76,27 @@ deriving DecidableEq, Repr
 
 open Axis
 
-/-- The spectral basis index: SysNode × Trinity × Axis -/
+/-- Tetrahedral role: UPPER, LOWER, INTERSECTION, CENTER.
+    
+    This encodes the directional triad structure:
+    - UPPER: Upper tetrahedral position
+    - LOWER: Lower tetrahedral position
+    - INTERSECTION: Intersection point
+    - CENTER: Central/balanced position
+-/
+inductive TetraRole : Type
+  | upper
+  | lower
+  | intersection
+  | center
+deriving DecidableEq, Repr
+
+open TetraRole
+
+/-- The spectral basis index: SysNode × TetraRole × Trinity × Axis -/
 structure BasisIndex where
   node : SysNode
+  tetra_role : TetraRole
   trinity : Trinity
   axis : Axis
 deriving DecidableEq, Repr
@@ -95,6 +113,32 @@ The operator H_full is built from several coupling terms:
 
 Each coupling respects the geometric structure.
 -/
+
+/-- Cross-level coupling: connects nodes across system levels.
+    
+    This mirrors the wrapUp pattern where sub_nodes feed into parents.
+    A node at level L+1 couples to nodes at level L that it "wraps".
+    
+    The coupling strength depends on:
+    - Level difference (should be 1 for wrapUp pattern)
+    - Position matching (same position in wrapped cycle)
+    - Role alignment (how tetra roles interact)
+-/
+def crossLevelCoupling (x y : BasisIndex) : ℝ :=
+  -- Only couple if levels differ by exactly 1 (wrapUp pattern)
+  if (x.node.level = y.node.level + 1 ∨ y.node.level = x.node.level + 1) ∧
+     x.node.pos = y.node.pos ∧  -- Same position in wrapped cycle
+     x.trinity = y.trinity ∧
+     x.axis = y.axis then
+    -- Base cross-level coupling (weaker than same-level)
+    let baseStrength := 0.3
+    -- Enhanced if roles align (UPPER→UPPER, LOWER→LOWER, etc.)
+    let roleAlignment := if x.tetra_role = y.tetra_role then 0.2 else 0.0
+    -- Enhanced if UFRF-prime
+    let primeEnhancement := if isUPrime x.node ∨ isUPrime y.node then 0.2 else 0.0
+    baseStrength + roleAlignment + primeEnhancement
+  else
+    0.0
 
 /-- Cycle coupling: connects neighboring positions on the 13-cycle.
 
@@ -133,8 +177,59 @@ def cycleCoupling (x y : BasisIndex) : ℝ :=
   else
     0.0
 
+/-- Directional harmonic kernel: root, 5th, 4th with φ and 1/φ weighting.
+    
+    This implements the DirectionalTriad pattern:
+    - Root position: base reference
+    - 5th position: expansion (weighted by φ)
+    - 4th position: return/contraction (weighted by 1/φ)
+    
+    Role-dependent emphasis:
+    - UPPER: Emphasis on expansion (5th)
+    - LOWER: Emphasis on return (4th)
+    - INTERSECTION: Balanced
+    - CENTER: Neutral
+-/
+def directionalHarmonicKernel (x y : BasisIndex) : ℝ :=
+  if x.node.level = y.node.level ∧
+     x.trinity = y.trinity ∧
+     x.axis = y.axis then
+    -- Check if y.pos = fifthsStep x.pos (5th - expansion)
+    if y.node.pos = fifthsStep x.node.pos then
+      -- Base strength weighted by φ for expansion
+      let phiWeight := phi
+      let baseStrength := 0.5 * phiWeight
+      -- Role-dependent emphasis
+      let roleEmphasis :=
+        match x.tetra_role with
+        | upper => 1.2  -- UPPER emphasizes expansion
+        | lower => 0.8
+        | intersection => 1.0
+        | center => 1.0
+      baseStrength * roleEmphasis
+    -- Check if y.pos = fourthsStep x.pos (4th - return)
+    else if y.node.pos = fourthsStep x.node.pos then
+      -- Base strength weighted by 1/φ for return
+      let invPhiWeight := 1 / phi
+      let baseStrength := 0.5 * invPhiWeight
+      -- Role-dependent emphasis
+      let roleEmphasis :=
+        match x.tetra_role with
+        | upper => 0.8
+        | lower => 1.2  -- LOWER emphasizes return
+        | intersection => 1.0
+        | center => 1.0
+      baseStrength * roleEmphasis
+    else
+      0.0
+  else
+    0.0
+
 /-- Harmonic coupling: connects via circle-of-fifths or circle-of-fourths.
 
+    This now uses the directional harmonic kernel with φ weighting,
+    plus additional enhancements for UFRF-primality and nesting.
+    
     Two basis indices are harmonically coupled if:
     - Same system level
     - Same trinity
@@ -142,27 +237,21 @@ def cycleCoupling (x y : BasisIndex) : ℝ :=
     - Positions are related by fifthsStep or fourthsStep
     
     Coupling is enhanced by:
+    - Directional harmonic kernel (φ/1/φ weighting)
     - UFRF-primality (both nodes - harmonic resonance)
     - Nesting-special positions (manifold resonance)
     - System level (manifoldChannels structure)
 -/
 def harmonicCoupling (x y : BasisIndex) : ℝ :=
-  if x.node.level = y.node.level ∧
-     x.trinity = y.trinity ∧
-     x.axis = y.axis then
-    -- Check if y.pos = fifthsStep x.pos or y.pos = fourthsStep x.node.pos
-    if y.node.pos = fifthsStep x.node.pos ∨ y.node.pos = fourthsStep x.node.pos then
-      -- Base harmonic coupling strength
-      let baseStrength := 0.5
-      -- Enhanced if both are UFRF-prime (harmonic resonance)
-      let primeResonance := if isUPrime x.node ∧ isUPrime y.node then 0.3 else 0.0
-      -- Enhanced if nesting-special (manifold resonance at 89, 233)
-      let nestingResonance := if (isNestingSpecial x.node.pos ∧ isNestingSpecial y.node.pos) then 0.4 else 0.0
-      -- Enhanced by system level (manifoldChannels: 3^L structure)
-      let levelResonance := (x.node.level : ℝ) * 0.15
-      baseStrength + primeResonance + nestingResonance + levelResonance
-    else
-      0.0
+  let directionalKernel := directionalHarmonicKernel x y
+  if directionalKernel > 0 then
+    -- Enhanced if both are UFRF-prime (harmonic resonance)
+    let primeResonance := if isUPrime x.node ∧ isUPrime y.node then 0.3 else 0.0
+    -- Enhanced if nesting-special (manifold resonance at 89, 233)
+    let nestingResonance := if (isNestingSpecial x.node.pos ∧ isNestingSpecial y.node.pos) then 0.4 else 0.0
+    -- Enhanced by system level (manifoldChannels: 3^L structure)
+    let levelResonance := (x.node.level : ℝ) * 0.15
+    directionalKernel + primeResonance + nestingResonance + levelResonance
   else
     0.0
 
@@ -263,7 +352,8 @@ This operator is symmetric and reflects the UFRF geometric structure.
     It combines:
     - Diagonal mass term (when x = y)
     - Cycle coupling (neighbors on 13-cycle)
-    - Harmonic coupling (fifths/fourths connections)
+    - Harmonic coupling (directional fifths/fourths with φ weighting)
+    - Cross-level coupling (wrapUp pattern: sub_nodes → parents)
     - Trinity coupling (trinity state transitions)
     - Axis coupling (EW ↔ NS transitions)
 -/
@@ -271,6 +361,7 @@ def H_full (x y : BasisIndex) : ℝ :=
   (if x = y then massTerm x else 0.0) +
   cycleCoupling x y +
   harmonicCoupling x y +
+  crossLevelCoupling x y +
   trinityCoupling x y +
   axisCoupling x y
 

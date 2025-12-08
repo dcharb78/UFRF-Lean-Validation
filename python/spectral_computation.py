@@ -30,6 +30,13 @@ class Axis(Enum):
     EW = "ew"
     NS = "ns"
 
+class TetraRole(Enum):
+    """Tetrahedral role: UPPER, LOWER, INTERSECTION, CENTER"""
+    UPPER = "upper"
+    LOWER = "lower"
+    INTERSECTION = "intersection"
+    CENTER = "center"
+
 @dataclass(frozen=True)
 class SysNode:
     """System node: level and position in 13-cycle"""
@@ -41,13 +48,14 @@ class SysNode:
 
 @dataclass(frozen=True)
 class BasisIndex:
-    """Spectral basis index: SysNode × Trinity × Axis"""
+    """Spectral basis index: SysNode × TetraRole × Trinity × Axis"""
     node: SysNode
+    tetra_role: TetraRole
     trinity: Trinity
     axis: Axis
     
     def __hash__(self):
-        return hash((self.node.level, self.node.pos, self.trinity.value, self.axis.value))
+        return hash((self.node.level, self.node.pos, self.tetra_role.value, self.trinity.value, self.axis.value))
 
 # ============================================================================
 # Phase and UFRF-Primality
@@ -107,16 +115,78 @@ def fourths_step(pos: int) -> int:
     """Circle-of-fourths step: +5 mod 13"""
     return (pos + 5) % 13
 
-def harmonic_coupling(x: BasisIndex, y: BasisIndex) -> float:
-    """Harmonic coupling: circle-of-fifths/fourths"""
+# Golden ratio φ
+PHI = (1 + np.sqrt(5)) / 2
+INV_PHI = 1 / PHI
+
+def directional_harmonic_kernel(x: BasisIndex, y: BasisIndex) -> float:
+    """
+    Directional harmonic kernel: root, 5th, 4th with φ and 1/φ weighting.
+    
+    Role-dependent emphasis:
+    - UPPER: Emphasis on expansion (5th)
+    - LOWER: Emphasis on return (4th)
+    - INTERSECTION: Balanced
+    - CENTER: Neutral
+    """
     if (x.node.level == y.node.level and 
         x.trinity == y.trinity and 
         x.axis == y.axis):
-        if (y.node.pos == fifths_step(x.node.pos) or 
-            y.node.pos == fourths_step(x.node.pos)):
-            base_strength = 0.5
-            resonance = 0.3 if (is_uprime(x.node) and is_uprime(y.node)) else 0.0
-            return base_strength + resonance
+        # 5th position (expansion) - weighted by φ
+        if y.node.pos == fifths_step(x.node.pos):
+            base_strength = 0.5 * PHI
+            role_emphasis = {
+                TetraRole.UPPER: 1.2,
+                TetraRole.LOWER: 0.8,
+                TetraRole.INTERSECTION: 1.0,
+                TetraRole.CENTER: 1.0
+            }[x.tetra_role]
+            return base_strength * role_emphasis
+        # 4th position (return) - weighted by 1/φ
+        elif y.node.pos == fourths_step(x.node.pos):
+            base_strength = 0.5 * INV_PHI
+            role_emphasis = {
+                TetraRole.UPPER: 0.8,
+                TetraRole.LOWER: 1.2,
+                TetraRole.INTERSECTION: 1.0,
+                TetraRole.CENTER: 1.0
+            }[x.tetra_role]
+            return base_strength * role_emphasis
+    return 0.0
+
+def harmonic_coupling(x: BasisIndex, y: BasisIndex) -> float:
+    """
+    Harmonic coupling: uses directional kernel with φ weighting.
+    Enhanced by UFRF-primality and nesting.
+    """
+    directional_kernel = directional_harmonic_kernel(x, y)
+    if directional_kernel > 0:
+        prime_resonance = 0.3 if (is_uprime(x.node) and is_uprime(y.node)) else 0.0
+        nesting_resonance = 0.4 if (x.node.pos in [89 % 13, 233 % 13] and 
+                                   y.node.pos in [89 % 13, 233 % 13]) else 0.0
+        level_resonance = x.node.level * 0.15
+        return directional_kernel + prime_resonance + nesting_resonance + level_resonance
+    return 0.0
+
+def cross_level_coupling(x: BasisIndex, y: BasisIndex) -> float:
+    """
+    Cross-level coupling: mirrors wrapUp pattern where sub_nodes feed into parents.
+    
+    A node at level L+1 couples to nodes at level L that it "wraps".
+    Only couples if levels differ by exactly 1 (wrapUp pattern).
+    """
+    # Only couple if levels differ by exactly 1
+    level_diff = abs(x.node.level - y.node.level)
+    if (level_diff == 1 and
+        x.node.pos == y.node.pos and  # Same position in wrapped cycle
+        x.trinity == y.trinity and
+        x.axis == y.axis):
+        base_strength = 0.3
+        # Enhanced if roles align
+        role_alignment = 0.2 if x.tetra_role == y.tetra_role else 0.0
+        # Enhanced if UFRF-prime
+        prime_enhancement = 0.2 if (is_uprime(x.node) or is_uprime(y.node)) else 0.0
+        return base_strength + role_alignment + prime_enhancement
     return 0.0
 
 def trinity_coupling(x: BasisIndex, y: BasisIndex) -> float:
@@ -167,11 +237,22 @@ def mass_term(x: BasisIndex) -> float:
 # ============================================================================
 
 def H_full(x: BasisIndex, y: BasisIndex) -> float:
-    """Full spectral operator H_full"""
+    """
+    Full spectral operator H_full
+    
+    Combines:
+    - Diagonal mass term
+    - Cycle coupling (neighbors on 13-cycle)
+    - Harmonic coupling (directional fifths/fourths with φ weighting)
+    - Cross-level coupling (wrapUp pattern: sub_nodes → parents)
+    - Trinity coupling (trinity state transitions)
+    - Axis coupling (EW ↔ NS)
+    """
     diagonal = mass_term(x) if x == y else 0.0
     return (diagonal + 
             cycle_coupling(x, y) + 
             harmonic_coupling(x, y) + 
+            cross_level_coupling(x, y) +
             trinity_coupling(x, y) + 
             axis_coupling(x, y))
 
@@ -180,17 +261,24 @@ def H_full(x: BasisIndex, y: BasisIndex) -> float:
 # ============================================================================
 
 def enumerate_basis(max_level: int = 1) -> List[BasisIndex]:
-    """Enumerate basis indices up to max_level"""
+    """
+    Enumerate basis indices up to max_level.
+    
+    BasisIndex = SysNode × TetraRole × Trinity × Axis
+    """
     basis = []
     for level in range(max_level + 1):
         for pos in range(13):
-            for trinity in Trinity:
-                for axis in Axis:
-                    basis.append(BasisIndex(
-                        node=SysNode(level=level, pos=pos),
-                        trinity=trinity,
-                        axis=axis
-                    ))
+            node = SysNode(level=level, pos=pos)
+            for tetra_role in TetraRole:
+                for trinity in Trinity:
+                    for axis in Axis:
+                        basis.append(BasisIndex(
+                            node=node,
+                            tetra_role=tetra_role,
+                            trinity=trinity,
+                            axis=axis
+                        ))
     return basis
 
 def build_matrix(basis: List[BasisIndex]) -> np.ndarray:

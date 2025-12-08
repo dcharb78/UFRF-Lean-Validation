@@ -15,6 +15,9 @@ import UFRF.CriticalLine
 import UFRF.ZetaFunction
 import UFRF.RiemannHypothesis
 import UFRF.MonsterMoonshine
+import UFRF.RecursiveCycle
+import UFRF.Spectral
+import UFRF.UPrime
 
 namespace UFRF
 
@@ -53,6 +56,9 @@ This theorem demonstrates that:
 2. Observer perspective changes preserve structure (unity)
 3. All proofs share the same foundational cycle structure
 4. Monster Moonshine emerges from cycle geometry
+5. Recursive system levels and harmonic motion are unified
+6. Spectral operator H_full reflects the geometry
+7. UFRF-primality defines geometric activation points
 
 The 13-cycle in Foundation.lean is the common geometric foundation for:
 - Fine structure constant derivation
@@ -60,6 +66,10 @@ The 13-cycle in Foundation.lean is the common geometric foundation for:
 - Observer invariance (unity lemmas)
 - Riemann Hypothesis (trinity structure → critical line)
 - Monster Moonshine (harmonize phase primes → 196884)
+- Recursive cycles (SL0, SL1, SL2, ...)
+- Circle-of-fifths harmonic motion
+- Spectral operator basis (SysNode × Trinity × Axis)
+- UFRF-geometric primality
 -/
 theorem unified_ufrf_framework :
     -- Physical constants match experiment
@@ -72,7 +82,13 @@ theorem unified_ufrf_framework :
     (∀ s : ℂ, UFRF.Zeta.isNonTrivialZero s → UFRF.CriticalLine.onCriticalLine s) ∧
     -- Monster Moonshine: 196884 emerges from 13-cycle geometry
     (UFRF.Monster.monsterDimension = 
-      (cycleLen * 3 + 8) * (cycleLen * 4 + 7) * (cycleLen * 5 + 6) + 1) :=
+      (cycleLen * 3 + 8) * (cycleLen * 4 + 7) * (cycleLen * 5 + 6) + 1) ∧
+    -- Recursive cycles: circle-of-fifths is periodic
+    (∀ pos₀ : Fin cycleLen, RecursiveCycle.fifthsWalk pos₀ 13 = RecursiveCycle.fifthsWalk pos₀ 0) ∧
+    -- Spectral operator: H_full is symmetric
+    (∀ x y : Spectral.BasisIndex, Spectral.H_full x y = Spectral.H_full y x) ∧
+    -- UFRF-primality: REST position is prime
+    (UPrime.isUPrime { level := 0, pos := restIndex }) :=
   And.intro
     em_and_gravity_within_experiment
     (And.intro
@@ -81,7 +97,13 @@ theorem unified_ufrf_framework :
         (fun origin ph => phase_counts_invariant origin ph)
         (And.intro
           UFRF.RH.riemann_hypothesis
-          UFRF.Monster.monster_from_cycle_geometry)))
+          (And.intro
+            UFRF.Monster.monster_from_cycle_geometry
+            (And.intro
+              (fun pos₀ => RecursiveCycle.fifthsWalk_periodic pos₀)
+              (And.intro
+                (fun x y => Spectral.H_full_symmetric x y)
+                UPrime.restPos_is_UPrime))))))
 
 end UFRF
 

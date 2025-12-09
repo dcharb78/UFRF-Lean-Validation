@@ -8,7 +8,7 @@
 
 ### 1. The 13-Cycle Structure
 
-The UFRF framework is built on a **13-position cycle with no privileged center**:
+The UFRF framework is built on a 13-position cycle with no privileged center:
 
 ```lean
 theorem cycle_no_center :
@@ -41,11 +41,11 @@ The 13-cycle encodes E×B vortex rotation:
 - Cosine = B
 - Complex exponential = full vortex rotation
 
-This makes it a **Fourier-like object** that inherits harmonic symmetry.
+This makes it a Fourier-like object that inherits harmonic symmetry.
 
 ### 4. Riemann Zeta Structure
 
-The Riemann zeta function ALSO arises from:
+The Riemann zeta function also arises from:
 - Harmonic (Fourier/Mellin) structure
 - Rotation symmetry (via functional equation)
 - Critical line symmetry
@@ -61,36 +61,36 @@ Two rotation-invariant systems will show high correlation in:
 
 ### The 0.9968 Correlation
 
-This high correlation is **NOT** evidence of UFRF being "random" — it's evidence that:
+This high correlation is not evidence of UFRF being "random" — it's evidence that:
 
 1. **UFRF is rotation-invariant** (as designed)
 2. **Riemann zeta is rotation-invariant** (via functional equation)
 3. **Both share harmonic structure** (Fourier/Mellin)
 
-**Therefore**: High correlation is **expected** and **predicted** by UFRF axioms.
+**Therefore**: High correlation is expected and predicted by UFRF axioms.
 
 ## The Null Hypothesis Model
 
 ### Expected Behavior
 
 For any rotation-invariant system:
-- Global correlation with other rotation-invariant systems: **~0.99**
+- Global correlation with other rotation-invariant systems: ~0.99
 - This is due to shared harmonic/rotational symmetry
-- **Not** due to specific coupling details
+- Not due to specific coupling details
 
 ### What This Means
 
 The null hypothesis should be:
 - **H₀**: Rotation-invariant systems show high correlation
-- **H₁**: UFRF shows ADDITIONAL symmetry-breaking structure
+- **H₁**: UFRF shows additional symmetry-breaking structure
 
-We **reject H₀** (high correlation is expected) and **test H₁** (symmetry-breaking).
+We reject H₀ (high correlation is expected) and test H₁ (symmetry-breaking).
 
 ## The TRUE UFRF Signature
 
 ### Symmetry-Breaking Structures
 
-These are **NOT** rotation-invariant:
+These are not rotation-invariant:
 
 1. **REST position** (position 9)
    - Breaks rotation symmetry
@@ -114,11 +114,11 @@ Tests that differentiate UFRF from random:
 
 1. **Multi-scale resonance** (89, 233)
    - Random: No scale-dependent structure
-   - UFRF: Shows jumps at predicted scales ✅
+   - UFRF: Shows jumps at predicted scales
 
 2. **Harmonic walk invariants** (fifths/fourths)
    - Random: ~2.2 pairs per eigenvector
-   - UFRF: ~7.4 pairs per eigenvector ✅
+   - UFRF: ~7.4 pairs per eigenvector
 
 3. **GUE spacing** (vs GOE)
    - Needs refinement for finite-size effects
@@ -130,11 +130,11 @@ Tests that differentiate UFRF from random:
 
 ## Conclusion
 
-**The high correlation (0.9968) is EXPECTED** due to rotation-invariant structure.
+The high correlation (0.9968) is expected due to rotation-invariant structure.
 
-**The TRUE UFRF signature** is in symmetry-breaking statistics that random baselines cannot reproduce.
+The TRUE UFRF signature is in symmetry-breaking statistics that random baselines cannot reproduce.
 
-**This validates**:
+This validates:
 - UFRF's geometric foundation
 - The rotation-invariant design
 - The need for symmetry-breaking tests
@@ -147,4 +147,3 @@ Tests that differentiate UFRF from random:
 **Key Insight**: Rotation invariance explains correlation  
 **True Signature**: Symmetry-breaking structures  
 **Date**: December 2025
-

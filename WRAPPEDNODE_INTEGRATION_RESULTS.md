@@ -2,15 +2,16 @@
 
 ## Overview
 
-Successfully integrated WrappedNode hierarchy concepts into the spectral operator work, implementing:
-1. ✅ TetraRole in BasisIndex structure
-2. ✅ Directional harmonic kernel with φ weighting
-3. ✅ Cross-level couplings mirroring wrapUp pattern
-4. ✅ Training-spectral alignment test framework
+WrappedNode hierarchy concepts have been integrated into the spectral operator work:
+
+1. TetraRole in BasisIndex structure
+2. Directional harmonic kernel with φ weighting
+3. Cross-level couplings mirroring wrapUp pattern
+4. Training-spectral alignment test framework
 
 ## Implementation Summary
 
-### 1. Basis & Level Structure ✅
+### 1. Basis & Level Structure
 
 **Enhanced BasisIndex**:
 - **Before**: `SysNode × Trinity × Axis`
@@ -24,7 +25,7 @@ Successfully integrated WrappedNode hierarchy concepts into the spectral operato
 
 **Impact**: Basis size increased from 78 to 312 per level (4× due to TetraRole)
 
-### 2. Directional Harmonic Kernel ✅
+### 2. Directional Harmonic Kernel
 
 **Implementation**:
 - **5th position (expansion)**: Weighted by φ ≈ 1.618
@@ -44,7 +45,7 @@ def directionalHarmonicKernel (x y : BasisIndex) : ℝ :=
 
 **Result**: Harmonic coupling now explicitly encodes φ-tension in H_full
 
-### 3. Cross-Level Couplings ✅
+### 3. Cross-Level Couplings
 
 **Implementation**:
 - Couples nodes at level L+1 to nodes at level L (wrapUp pattern)
@@ -62,7 +63,7 @@ def crossLevelCoupling (x y : BasisIndex) : ℝ :=
 
 **Result**: Cross-level structure now mirrors WrappedNode.forward pattern
 
-### 4. Training-Spectral Alignment Test ✅
+### 4. Training-Spectral Alignment Test
 
 **Framework**:
 - Analyzes spectral eigenvectors for ζ-like zeros
@@ -74,8 +75,8 @@ def crossLevelCoupling (x y : BasisIndex) : ℝ :=
   - UPrime alignment
 
 **Results**:
-- **Nested Manifold Alignment**: 0.7031 ✅ (Strong)
-- **UPrime Alignment**: 0.8998 ✅ (Strong)
+- **Nested Manifold Alignment**: 0.7031 (Strong)
+- **UPrime Alignment**: 0.8998 (Strong)
 - **Position Correlation**: 0.3842 (Weak - expected with simulated data)
 - **Phase Correlation**: -0.5214 (Weak - needs refinement)
 
@@ -83,7 +84,7 @@ def crossLevelCoupling (x y : BasisIndex) : ℝ :=
 
 ## Key Findings
 
-### Strong Alignments ✅
+### Strong Alignments
 
 1. **UPrime Alignment (0.8998)**: 
    - UFRF-prime positions show high activity in both training and spectral
@@ -93,7 +94,7 @@ def crossLevelCoupling (x y : BasisIndex) : ℝ :=
    - Positions 89 and 233 show resonance in both domains
    - Validates nested manifold hypothesis
 
-### Areas Needing Refinement ⚠️
+### Areas Needing Refinement
 
 1. **Position Correlation (0.3842)**:
    - Weak correlation likely due to simulated training data
@@ -105,7 +106,7 @@ def crossLevelCoupling (x y : BasisIndex) : ℝ :=
 
 ## Significance
 
-### What This Achieves
+### Achievements
 
 1. **Explicit φ-Tension**: 
    - Directional kernel encodes φ and 1/φ explicitly
@@ -119,7 +120,7 @@ def crossLevelCoupling (x y : BasisIndex) : ℝ :=
    - Framework to compare training and spectral
    - Strong alignment in key structures (UPrime, manifolds)
 
-### Why It Matters
+### Implications
 
 - **Unifies Training and Spectral**: Same structures light up in both
 - **Encodes φ-Tension**: Explicit golden ratio weighting
@@ -129,18 +130,21 @@ def crossLevelCoupling (x y : BasisIndex) : ℝ :=
 ## Next Steps
 
 ### Immediate
-1. ✅ TetraRole added to BasisIndex
-2. ✅ Directional kernel implemented
-3. ✅ Cross-level couplings added
-4. ✅ Alignment test framework created
+
+1. TetraRole added to BasisIndex
+2. Directional kernel implemented
+3. Cross-level couplings added
+4. Alignment test framework created
 
 ### Short Term
+
 1. Test with real training data (not simulated)
 2. Refine phase-dependent coupling
 3. Analyze φ-tension effects on spectrum
 4. Compare cross-level coupling strength
 
 ### Medium Term
+
 1. Formalize directional kernel properties in Lean
 2. Prove cross-level coupling structure
 3. Connect to WrappedNode.forward formally
@@ -157,18 +161,17 @@ def crossLevelCoupling (x y : BasisIndex) : ℝ :=
 
 ## Conclusion
 
-**The WrappedNode hierarchy concepts are now integrated into the spectral operator**:
+The WrappedNode hierarchy concepts are now integrated into the spectral operator:
 
-- ✅ BasisIndex includes TetraRole
-- ✅ Directional kernel with φ weighting
-- ✅ Cross-level couplings mirror wrapUp pattern
-- ✅ Training-spectral alignment framework
+- BasisIndex includes TetraRole
+- Directional kernel with φ weighting
+- Cross-level couplings mirror wrapUp pattern
+- Training-spectral alignment framework
 
-**Strong alignment in key structures** (UPrime: 0.8998, Manifolds: 0.7031) validates the geometric foundation.
+Strong alignment in key structures (UPrime: 0.8998, Manifolds: 0.7031) validates the geometric foundation.
 
 ---
 
 **Status**: Implementation Complete, Tests Running  
 **Key Achievement**: φ-tension explicitly encoded in H_full  
 **Date**: December 2025
-

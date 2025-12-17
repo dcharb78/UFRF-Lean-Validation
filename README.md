@@ -1,5 +1,7 @@
 # UFRF Unified Formal Proofs
 
+![](https://muddy-frog-30d2.daniel-208.workers.dev/UFRF-Lean-Validation.png)
+
 **Unified formal proofs in Lean 4 demonstrating that fundamental physical constants emerge from a single geometric foundation.**
 
 ## Overview
